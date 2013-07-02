@@ -14,10 +14,10 @@
     <script type="text/javascript">
     if ((pos = document.cookie.indexOf('LD_LANG=')) > 0) {
         lang = document.cookie.substr(pos + 8, 5);
-        if (lang == '%23en')
-            window.location.href = 'index.en.html';
-        else
+        if (lang == '%23cn')
             window.location.href = 'index.cn.html';
+        else
+            window.location.href = 'index.en.html';
     }
     else
         window.location.href = 'index.cn.html';
