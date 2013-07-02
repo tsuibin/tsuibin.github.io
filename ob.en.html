@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Demo</title>
+		
+		<!-- Attach our CSS -->
+	  	<link rel="stylesheet" href="css/orbit-1.2.3.css">
+	  	
+		<!-- Attach necessary JS -->
+		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery.orbit-1.2.3.min.js"></script>	
+		<script type="text/javascript">
+			$(window).load(function() {
+				$('#featured').orbit(
+				{ bullets:true, timer: false}
+				);
+			});
+		</script>
+		
+	</head>
+	<body>
+	
+	<div class="container">
+		<div id="featured"> 
+                <img src="img/1.en.png" data-caption="#A1" />
+                <img src="img/2.en.png" data-caption="#A2" />
+                <img src="img/3.en.png" data-caption="#A3" />
+                <img src="img/4.png" data-caption="#A4" />
+			</div>
+            <!-- Captions for Orbit -->
+            <span class="orbit-caption" id="A1"><h3>DMusic and DPlayer</h3>Watch, listen and rejoice.</span>
+            <span class="orbit-caption" id="A2"><h3>DTalk</h3>Stay in touch wherever you are make every moment ever memorable.</span>
+            <span class="orbit-caption" id="A3"><h3>Deepin Software Center</h3>Enjoy more new apps and games for free.</span>
+            <span class="orbit-caption" id="A4"><h3>Developers</h3>Whether you are a developer or technical director,<br />you can be more productive with our support.</span>
+		
+		</div>	
+	</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html style="" class=" js no-touch svg inlinesvg svgclippaths no-ie8compat js no-touch svg inlinesvg svgclippaths no-ie8compat" lang="en"><!--<![endif]-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <!-- base href="http://www.linuxdeepin.com/" -->
+  <meta charset="utf-8">
+  <title>Linux Deepin</title>
+  <!-- styles -->
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- IE Fix for HTML5 Tags -->
+  <!--[if lt IE 9]> <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]-->
+  </head>
+<body>
+
+<header>
+
+<section id="upper-nav">
+	<div class="row">
+    	<div id="upper-nav-links">
+        	<ul>
+           	<li><a href="#">中文</a></li>    
+            <li><a href="#">ENGLISH</a></li>
+            <li><a href="http://planet.linuxdeepin.com">博客</a></li>      
+            </ul>
+        </div>
+</div>
+</section>
+ 	
+<nav id="main-nav" class="row">
+
+  	
+    <div id="logo" class="columns" style="width:33%">
+    	<a href=""><img src="img/logo.png" alt="Formstack Online Form Builder"></a>
+    </div>
+    
+	<div id="site-links" class="columns" style="width:42%">
+    	<ul class="nav-bar" id="mobile-submenu">
+  			<li ><a href="http://www.linuxdeepin.com/index.cn.html">首页</a></li>
+            <!-- <li><a href="#">特性</a></li> -->
+            <li class="has-flyout" style="display: inline;"><a href="http://www.linuxdeepin.com/forum">社区</a>
+            	<ul style="display: none;" class="flyout">
+                <li><a href="http://www.linuxdeepin.com/forum">论坛</a></li>
+                <li><a href="http://wiki.linuxdeepin.com">百科</a></li>
+                <li><a href="http://www.linuxdeepin.com/mantis">BUG管理</a></li>
+                </ul>
+            </li>
+            <li><a href="http://www.linuxdeepin.com/download.cn.html">下载</a></li>
+   			
+   			<li><a href="http://www.linuxdeepin.com/business.cn.html">商务合作</a></li>
+		</ul>
+    </div>
+    
+    <div id="trial-login" class="three columns">
+        <a href="http://e.weibo.com/linuxdeepinnew" class="button orange login">官方微博</a>
+        <a href="http://www.linuxdeepin.com/download.cn.html" class="button green trial">立即试用</a>
+ 	</div>
+    
+</nav>
+ 
+</header>
+    
+    <!-- Mobile Menu Toggle -->
+  <script>
+  $=jQuery;
+  $("#mobile-menu").click(function(){
+    $("#mobile-submenu").toggle();
+});
+  </script>
+  <!-- Included JS Files (Compressed) --> <script src="js/foundation.js"></script>
+  <!-- Initialize JS Plugins --> <script src="js/app.js"></script>
+</body>
+</html>
