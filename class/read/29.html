@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - numpy 入门</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<script type="text/javascript" src="/static/tutorials/jquery.liveflex.Tree.js?ver=2"></script>
+    
+    
+  
+<script>$.ajaxSetup({cache:false, traditional:true});</script></head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+<div class="container">
+    <div class="content-outter">
+        
+
+
+
+
+<style type="text/css">
+.over{outline:solid 1px #afa}
+.on{border:solid 1px green;}
+.below{border-bottom:solid 2px #f00;}
+.below span{}
+.above{border-top:solid 2px #f00;}
+.tree_hover{background:#ccc}
+.ui-droppable {cursor:move;}
+</style>
+
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/tutorial/read/29.html">numpy 入门</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        目录
+      </li>
+    </ul>
+
+    <div>
+        
+    </div>
+    
+    
+    <ul class="unstyled chapter-list" style="margin-top:18px;" id="titles-list">
+    
+        
+        
+            
+            <li data-id="258" data-order="1">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/258.html" class="chapter-title" id="info-258">开始</a>
+                    [<span class="small gray">字数:1329/评论数:0/访问次数:6</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                        <img src="/static/tutorials/new.png"/>
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/uploads/portraits/3.50x50.jpg" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:hejiasheng</li>'
+                            +   '<li><span class="tip-label">更新于</span>:17 hours, 21 minutes ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:1329</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-258').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+        
+    
+    </ul>
+
+    </div>    
+</div>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+
+  </body>
+</html>

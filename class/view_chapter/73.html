@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel) - Makefile的书写</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/asset/prettify.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/asset/prettify.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/pageslide/jquery.pageslide.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.form.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/toc/toc.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/fontawesome/css/font-awesome.css?ver=2"/>
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/bootstrap/fontawesome/css/font-awesome-ie7.css">
+<![endif]-->
+
+<script type="text/javascript" src="/static/tutorials/comment.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/ui.totop.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.ui.totop.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jquery.hotkeys.js?ver=2"></script>
+    
+    
+  </head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#pageslide {
+width:320px;
+}
+#toc {width:22%;}
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                Makefile的书写
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span9" id="article">
+            <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+      chromium.org/developers/how-tos/chrome-frame-getting-started -->
+ <!--[if lt IE 8]><div class="alert alert-info">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</div><![endif]-->
+
+            <div class="outter">
+                <div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/97.html"><i class="icon-arrow-left"></i> 1.3 内核源代码的目录结构</a>
+                </div>
+                <div class="chapter-next chapter-top animated">
+                    <a next-chapter href="/tutorial/view_chapter/131.html">1.5 源码阅读工具 <i class="icon-arrow-right"></i></a>
+                </div>
+                <div class="expander">&raquo;</div>
+                <div class="content-inner rounded_bottom article">
+                    <h1>Makefile的书写</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/73?para=0" class="para-comments-count active right animated">0</a> -->
+                            <span class="gray">hejiasheng 于 2012-09-24 02:39:30+00:00 更新</span>
+                            <span class="label label-info">访问次数：1102</span>
+                        
+                    </div>
+                    
+                    
+                
+                    <blockquote><p>1.什么是Makefile</p>
+<p>如果大家在windows下有过编程经验，大家在运行程序一般会点一个按钮，或ctrl+f5实际这个工作 基本上是Makefile的工作（除执行外），完成的程序的编译，链接。那么在Linux下，我们一般使用 Makefile来完成这个工作，大家大体应该知道Makefile的功能，下面我们将说下，如何书写Makefile?</p>
+</blockquote>
+<blockquote><p>2.Makefile文件的书写</p>
+<p>下面是一段c++的程序，通过它我们能自动生成Makefile文件</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>//-------------------------------------------------------------------
+//	mmake.cpp	    (An LKM developer's tool for Linux 2.6) 
+//
+//	This utility compiles the kernel-modules whose source-files
+//	reside in the current directory (then cleans up afterward).
+//	
+//	Adapted from: "Building and Running Modules" (Chapter Two), 
+//	in: "Linux Device Drivers (3rd Ed)," by Rubini and Corbett. 
+//
+//	programmer: ALLAN CRUSE
+//	written on: 22 JAN 2005
+//	revised on: 19 MAR 2005 -- command-line arguments override
+//	revised on: 27 JUL 2006 -- extra cleanup for kernel 2.6.17
+//	revised on: 31 MAY 2007 -- adjust extra cleanup for 2.6.18
+//-------------------------------------------------------------------
+
+#include &lt;stdio.h&gt;	// for fopen(), fprintf(), fclose(), perror() 
+#include &lt;dirent.h&gt;	// for opendir(), readdir()
+#include &lt;string.h&gt;	// for strchr(), strncmp(), strncpy()
+#include &lt;stdlib.h&gt;	// for exit() 
+
+int main( int argc, char **argv )
+{
+	DIR	*dp = opendir( "." );	// open the current directory
+	if ( dp == NULL ) { perror( "opendir" ); exit(1); }
+
+	FILE	*fp = fopen( "Makefile", "w" );	// create 'Makefile'
+	if ( fp == NULL ) { perror( "Makefile" ); exit(1); }
+
+	// write boilerplate statements to compile Linux 2.6 modules	
+	fprintf( fp, "\nifneq\t($(KERNELRELEASE),)" );
+	fprintf( fp, "\nobj-m\t:= " ); 
+
+	// form the list of ".o" files from command-line arguments
+	char	filename[ NAME_MAX ];
+	for (int i = 1; i &lt; argc; i++)
+		{
+		strncpy( filename, argv[i], NAME_MAX );
+		char	*suffixp = strchr( filename, '.' );
+		if (( suffixp == NULL )&amp;&amp;( strlen(filename) &lt; NAME_MAX-3 ))
+			strncat( filename, ".o", 3 );  
+		suffixp = strchr( filename, '.' );
+		if ( strncmp( suffixp, ".o", 3 ) != 0 ) 
+			strncpy( suffixp, ".o", 3 );
+		fprintf( fp, "%s ", filename );
+		}
+
+	// or form the list of ".o" files from current ".c" files	
+	struct dirent		*entry;
+	if ( argc == 1 ) while ( entry = readdir( dp ) )
+		{
+		strncpy( filename, entry-&gt;d_name, NAME_MAX );
+		char	*suffixp = strchr( filename, '.' );
+		if ( suffixp == NULL ) continue;
+		if ( strncmp( suffixp, ".c", 3 ) != 0 ) continue; 
+		strncpy( suffixp, ".o", 3 );
+		fprintf( fp, "%s ", filename );
+		}
+
+	// generate the remainder of the 'Makefile' boilerplate 
+	fprintf( fp, "\n" );
+	fprintf( fp, "\nelse" );
+	fprintf( fp, "\nKDIR\t:= /lib/modules/$(shell uname -r)/build" );
+	fprintf( fp, "\nPWD\t:= $(shell pwd)" );
+	fprintf( fp, "\n" );
+	fprintf( fp, "default:\t" );
+	fprintf( fp, "\n\t$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules ");
+    fprintf (fp, "\n\trm -r -f .tmp_versions *.mod.c .*.cmd *.o *~ ");
+    //fprintf( fp, "Modules.symvers " ); // &lt;-- added 7/27/2006
+    fprintf (fp, "*.symvers ");   // &lt;-- added 5/31/2007
+    fprintf (fp, "\n");
+    fprintf (fp, "clean:\t");
+    fprintf (fp, "\n\trm -r -f *.ko mmake  *.order ");
+    fprintf (fp, "\n");
+
+	fprintf( fp, "\nendif" );
+	fprintf( fp, "\n\n" );
+	fclose( fp );
+
+	// execute the 'make' utility using our just-created 'Makefile'
+	system(" make ");
+}</code></pre>
+<blockquote><p>将上面的代码存在mmake.cpp中，然后打开终端：</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>$ g++ mmake.cpp -o mmake</code></pre>
+<blockquote><p>这时将会生成一个mmake的可执行的二进制文件，，， 以后我们将通过它来生成我们对应的Makefile文件。。。 多好的代码，以后就不用手写Makefile了。。。</p>
+<p>我们知道对于初学者写Makefile难度是有一定的。。。 有了上面的程序，以后我们只要写好我们的 内核模块程序比如：  kello.c 我们在终端上面</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>$ ./mmake kello.c</code></pre>
+<blockquote><p>那么会为我们自动的生成Makefile同时编译好我们的程序。。。 具体示例请参见后面的内核模块之Hello,world</p>
+<p>准备工作到此结束，在下一章节中，我们将开始Linux的内核模块的一步一步的学习了。。。</p>
+<p>对于上面的例子，有网友说不能支持多个文件的Makefile，确实目前这个程序是不支持多个文件的Makefile, 对于这个程序只是起一个引导的作用，让没有Makefile经验的人，第一次感觉跨度不大。 对于多个文件的我们给出一个例子供参考，比如说有两个文件(hello.c,world.c),最后生成的模块为main.ko：</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>ifneq	($(KERNELRELEASE),)
+obj-m	:= main.o
+main-objs = hello.o world.o 
+
+else
+KDIR	:= /lib/modules/$(shell uname -r)/build
+PWD	:= $(shell pwd)
+default:	
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules 
+	rm -r -f .tmp_versions *.mod.c .*.cmd *.o *~ *.symvers 
+clean:	
+	rm -r -f *.ko mmake  *.order 
+endif</code></pre>
+
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/73?para=0" class="para-comments-count active right animated">0</a>
+                            <span class="gray">hejiasheng 于 2012-09-24 02:39:30+00:00 更新</span>
+                        </p>
+                    </div>
+                    
+                    <!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1342595503212835&type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<script src="http://mediaplayer.yahoo.com/js"></script>
+
+                
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
+                    </div>
+                
+                    <div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/97.html"><i class="icon-arrow-left"></i> 1.3 内核源代码的目录结构</a>
+                    </div>
+                    <div class="chapter-next chapter-down animated">
+                        <a next-chapter href="/tutorial/view_chapter/131.html">1.5 源码阅读工具 <i class="icon-arrow-right"></i></a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        <div class="span3" id="right-side">
+            
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<style>
+#toc {top:140px;}
+</style>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    /*(function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    */
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        //$('body').scrollspy({target:'#titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/73',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/73?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                        //处理toTop
+                        reset_totop();
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                        //处理toTop
+                        reset_totop();
+                    }
+                });
+                
+            }
+        });
+        /*
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        */
+        
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
+        //増加限制目录区高度的处理
+        //$('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        //$('#titles a').anchorScroll({offset:50});
+        
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
+        });
+        
+        
+        //増加代码提示
+        $('pre, .inline-tag').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
+        
+    });
+</script>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+<!-- bottomlinks -->
+<script>$.ajaxSetup({cache:false, traditional:true});</script>
+<script type="text/javascript" src="/static/pageslide/jquery.pageslide.js?ver=2"></script>
+<script type="text/javascript" src="/static/toc/toc.js?ver=2"></script>
+
+
+  </body>
+</html>

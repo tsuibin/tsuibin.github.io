@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel) - cat 命令的实现</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/asset/prettify.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/asset/prettify.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/pageslide/jquery.pageslide.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.form.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/toc/toc.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/fontawesome/css/font-awesome.css?ver=2"/>
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/bootstrap/fontawesome/css/font-awesome-ie7.css">
+<![endif]-->
+
+<script type="text/javascript" src="/static/tutorials/comment.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/ui.totop.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.ui.totop.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jquery.hotkeys.js?ver=2"></script>
+    
+    
+  </head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#pageslide {
+width:320px;
+}
+#toc {width:22%;}
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                cat 命令的实现
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span9" id="article">
+            <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+      chromium.org/developers/how-tos/chrome-frame-getting-started -->
+ <!--[if lt IE 8]><div class="alert alert-info">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</div><![endif]-->
+
+            <div class="outter">
+                <div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/101.html"><i class="icon-arrow-left"></i> 4.2 Elf格式编程</a>
+                </div>
+                
+                <div class="expander">&raquo;</div>
+                <div class="content-inner rounded_bottom article">
+                    <h1>cat 命令的实现</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/110?para=0" class="para-comments-count active right animated">0</a> -->
+                            <span class="gray">valley 于 2012-08-20 05:24:41+00:00 更新</span>
+                            <span class="label label-info">访问次数：518</span>
+                        
+                    </div>
+                    
+                    
+                
+                    <p>在内核中我们用到了很多很多命令，比如ls ,cat ,mkdir 下面我们来实现一个cat命令</p>
+<pre class="prettyprint linenums pre-scrollable"><code>//-------------------------------------------------------------------
+//	mycat.c
+//
+//	This program shows how the default behavior of the standard
+//	UNIX/Linux 'cat' command could readily be implemented in C.  
+//	(Consult the 'man' page for 'cat' to see the 'options' that 
+//	would need to be added to achieve a total 'cat' emulation.)
+//
+//		compile using:  $ gcc mycat.c -o mycat
+//		execute using:  $ ./mycat &lt;filename&gt;
+//
+//	programmer: ALLAN CRUSE
+//	written on: 24 AUG 2007
+//-------------------------------------------------------------------
+
+#include &lt;fcntl.h&gt;	// for open() 
+#include &lt;stdio.h&gt;	// for perror() 
+#include &lt;unistd.h&gt;	// for read(), write(), close() 
+
+int main( int argc, char *argv[] )
+{
+	int	i, fd, ch;	// declare local variables
+
+	for (i = 1; i &lt; argc; i++)
+		{
+		fd = open( argv[i], O_RDONLY );
+		if ( fd &lt; 0 ) { perror( argv[i] ); continue; }
+		while ( read( fd, &amp;ch, 1 ) == 1 ) 
+			write( STDOUT_FILENO, &amp;ch, 1 );
+		close( fd );
+		}
+}</code></pre>
+<p>将上述文件保存为mycat.c</p>
+<pre class="prettyprint linenums pre-scrollable"><code>$ make mycat</code></pre>
+<pre class="prettyprint linenums pre-scrollable"><code>$ ./mycat mycat.c</code></pre>
+<p>它的效果如下：</p>
+<p><img src="http://uliweb.clkg.org/uploads/tutorials/11/388a94f8ea8711e1a8abf23c91df0780.png"&gt;</p>
+
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/110?para=0" class="para-comments-count active right animated">0</a>
+                            <span class="gray">valley 于 2012-08-20 05:24:41+00:00 更新</span>
+                        </p>
+                    </div>
+                    
+                    <!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1342595503212835&type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<script src="http://mediaplayer.yahoo.com/js"></script>
+
+                
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
+                    </div>
+                
+                    <div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/101.html"><i class="icon-arrow-left"></i> 4.2 Elf格式编程</a>
+                    </div>
+                    
+                    
+                </div>
+                
+            </div>
+        </div>
+        <div class="span3" id="right-side">
+            
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<style>
+#toc {top:140px;}
+</style>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    /*(function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    */
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        //$('body').scrollspy({target:'#titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/110',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/110?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                        //处理toTop
+                        reset_totop();
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                        //处理toTop
+                        reset_totop();
+                    }
+                });
+                
+            }
+        });
+        /*
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        */
+        
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
+        //増加限制目录区高度的处理
+        //$('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        //$('#titles a').anchorScroll({offset:50});
+        
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
+        });
+        
+        
+        //増加代码提示
+        $('pre, .inline-tag').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
+        
+    });
+</script>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+<!-- bottomlinks -->
+<script>$.ajaxSetup({cache:false, traditional:true});</script>
+<script type="text/javascript" src="/static/pageslide/jquery.pageslide.js?ver=2"></script>
+<script type="text/javascript" src="/static/toc/toc.js?ver=2"></script>
+
+
+  </body>
+</html>

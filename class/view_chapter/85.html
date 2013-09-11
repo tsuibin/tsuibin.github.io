@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel) - 内核模块之进程</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/asset/prettify.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/asset/prettify.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/pageslide/jquery.pageslide.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.form.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/toc/toc.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/fontawesome/css/font-awesome.css?ver=2"/>
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/bootstrap/fontawesome/css/font-awesome-ie7.css">
+<![endif]-->
+
+<script type="text/javascript" src="/static/tutorials/comment.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/ui.totop.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.ui.totop.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jquery.hotkeys.js?ver=2"></script>
+    
+    
+  </head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#pageslide {
+width:320px;
+}
+#toc {width:22%;}
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                内核模块之进程
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span9" id="article">
+            <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+      chromium.org/developers/how-tos/chrome-frame-getting-started -->
+ <!--[if lt IE 8]><div class="alert alert-info">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</div><![endif]-->
+
+            <div class="outter">
+                <div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/81.html"><i class="icon-arrow-left"></i> 2.3 内核模块之PROC文件系统</a>
+                </div>
+                <div class="chapter-next chapter-top animated">
+                    <a next-chapter href="/tutorial/view_chapter/90.html">2.5 内核模块之链表 <i class="icon-arrow-right"></i></a>
+                </div>
+                <div class="expander">&raquo;</div>
+                <div class="content-inner rounded_bottom article">
+                    <h1>内核模块之进程</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/85?para=0" class="para-comments-count active right animated">0</a> -->
+                            <span class="gray">valley 于 2012-09-23 11:51:09+00:00 更新</span>
+                            <span class="label label-info">访问次数：635</span>
+                        
+                    </div>
+                    
+                    
+                
+                    <blockquote><p>什么是进程？ 用ulk的描述： 充分的描述程序已经执行到任何程度的数据结构的汇集，它的目的是担当分配系统（CPU时间、内存）的实体。</p>
+<p>我们首先看下进程的结构体：</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>
+struct task_struct {
+	volatile long state;	/* -1 unrunnable, 0 runnable, &gt;0 stopped */
+	void *stack;
+	atomic_t usage;
+	unsigned int flags;	/* per process flags, defined below */
+	unsigned int ptrace;
+
+	int lock_depth;		/* BKL lock depth */
+
+#ifdef CONFIG_SMP
+#ifdef __ARCH_WANT_UNLOCKED_CTXSW
+	int oncpu;
+#endif
+#endif
+
+	int prio, static_prio, normal_prio;
+	unsigned int rt_priority;
+	const struct sched_class *sched_class;
+	struct sched_entity se;
+	struct sched_rt_entity rt;
+
+#ifdef CONFIG_PREEMPT_NOTIFIERS
+	/* list of struct preempt_notifier: */
+	struct hlist_head preempt_notifiers;
+#endif
+
+	/*
+	 * fpu_counter contains the number of consecutive context switches
+	 * that the FPU is used. If this is over a threshold, the lazy fpu
+	 * saving becomes unlazy to save the trap. This is an unsigned char
+	 * so that after 256 times the counter wraps and the behavior turns
+	 * lazy again; this to deal with bursty apps that only use FPU for
+	 * a short time
+	 */
+	unsigned char fpu_counter;
+#ifdef CONFIG_BLK_DEV_IO_TRACE
+	unsigned int btrace_seq;
+#endif
+
+	unsigned int policy;
+	cpumask_t cpus_allowed;
+
+#ifdef CONFIG_PREEMPT_RCU
+	int rcu_read_lock_nesting;
+	char rcu_read_unlock_special;
+	struct list_head rcu_node_entry;
+#endif /* #ifdef CONFIG_PREEMPT_RCU */
+#ifdef CONFIG_TREE_PREEMPT_RCU
+	struct rcu_node *rcu_blocked_node;
+#endif /* #ifdef CONFIG_TREE_PREEMPT_RCU */
+#ifdef CONFIG_RCU_BOOST
+	struct rt_mutex *rcu_boost_mutex;
+#endif /* #ifdef CONFIG_RCU_BOOST */
+
+#if defined(CONFIG_SCHEDSTATS) || defined(CONFIG_TASK_DELAY_ACCT)
+	struct sched_info sched_info;
+#endif
+
+	struct list_head tasks;
+#ifdef CONFIG_SMP
+	struct plist_node pushable_tasks;
+#endif
+
+	struct mm_struct *mm, *active_mm;
+#ifdef CONFIG_COMPAT_BRK
+	unsigned brk_randomized:1;
+#endif
+#if defined(SPLIT_RSS_COUNTING)
+	struct task_rss_stat	rss_stat;
+#endif
+/* task state */
+	int exit_state;
+	int exit_code, exit_signal;
+	int pdeath_signal;  /*  The signal sent when the parent dies  */
+	/* ??? */
+	unsigned int personality;
+	unsigned did_exec:1;
+	unsigned in_execve:1;	/* Tell the LSMs that the process is doing an
+				 * execve */
+	unsigned in_iowait:1;
+
+
+	/* Revert to default priority/policy when forking */
+	unsigned sched_reset_on_fork:1;
+
+	pid_t pid;
+	pid_t tgid;
+
+#ifdef CONFIG_CC_STACKPROTECTOR
+	/* Canary value for the -fstack-protector gcc feature */
+	unsigned long stack_canary;
+#endif
+
+	/* 
+	 * pointers to (original) parent process, youngest child, younger sibling,
+	 * older sibling, respectively.  (p-&gt;father can be replaced with 
+	 * p-&gt;real_parent-&gt;pid)
+	 */
+	struct task_struct *real_parent; /* real parent process */
+	struct task_struct *parent; /* recipient of SIGCHLD, wait4() reports */
+	/*
+	 * children/sibling forms the list of my natural children
+	 */
+	struct list_head children;	/* list of my children */
+	struct list_head sibling;	/* linkage in my parent's children list */
+	struct task_struct *group_leader;	/* threadgroup leader */
+
+	/*
+	 * ptraced is the list of tasks this task is using ptrace on.
+	 * This includes both natural children and PTRACE_ATTACH targets.
+	 * p-&gt;ptrace_entry is p's link on the p-&gt;parent-&gt;ptraced list.
+	 */
+	struct list_head ptraced;
+	struct list_head ptrace_entry;
+
+	/* PID/PID hash table linkage. */
+	struct pid_link pids[PIDTYPE_MAX];
+	struct list_head thread_group;
+
+	struct completion *vfork_done;		/* for vfork() */
+	int __user *set_child_tid;		/* CLONE_CHILD_SETTID */
+	int __user *clear_child_tid;		/* CLONE_CHILD_CLEARTID */
+
+	cputime_t utime, stime, utimescaled, stimescaled;
+	cputime_t gtime;
+#ifndef CONFIG_VIRT_CPU_ACCOUNTING
+	cputime_t prev_utime, prev_stime;
+#endif
+	unsigned long nvcsw, nivcsw; /* context switch counts */
+	struct timespec start_time; 		/* monotonic time */
+	struct timespec real_start_time;	/* boot based time */
+/* mm fault and swap info: this can arguably be seen as either mm-specific or thread-specific */
+	unsigned long min_flt, maj_flt;
+
+	struct task_cputime cputime_expires;
+	struct list_head cpu_timers[3];
+
+/* process credentials */
+	const struct cred __rcu *real_cred; /* objective and real subjective task
+					 * credentials (COW) */
+	const struct cred __rcu *cred;	/* effective (overridable) subjective task
+					 * credentials (COW) */
+	struct cred *replacement_session_keyring; /* for KEYCTL_SESSION_TO_PARENT */
+
+	char comm[TASK_COMM_LEN]; /* executable name excluding path
+				     - access with [gs]et_task_comm (which lock
+				       it with task_lock())
+				     - initialized normally by setup_new_exec */
+/* file system info */
+	int link_count, total_link_count;
+#ifdef CONFIG_SYSVIPC
+/* ipc stuff */
+	struct sysv_sem sysvsem;
+#endif
+#ifdef CONFIG_DETECT_HUNG_TASK
+/* hung task detection */
+	unsigned long last_switch_count;
+#endif
+/* CPU-specific state of this task */
+	struct thread_struct thread;
+/* filesystem information */
+	struct fs_struct *fs;
+/* open file information */
+	struct files_struct *files;
+/* namespaces */
+	struct nsproxy *nsproxy;
+/* signal handlers */
+	struct signal_struct *signal;
+	struct sighand_struct *sighand;
+
+	sigset_t blocked, real_blocked;
+	sigset_t saved_sigmask;	/* restored if set_restore_sigmask() was used */
+	struct sigpending pending;
+
+	unsigned long sas_ss_sp;
+	size_t sas_ss_size;
+	int (*notifier)(void *priv);
+	void *notifier_data;
+	sigset_t *notifier_mask;
+	struct audit_context *audit_context;
+#ifdef CONFIG_AUDITSYSCALL
+	uid_t loginuid;
+	unsigned int sessionid;
+#endif
+	seccomp_t seccomp;
+
+/* Thread group tracking */
+   	u32 parent_exec_id;
+   	u32 self_exec_id;
+/* Protection of (de-)allocation: mm, files, fs, tty, keyrings, mems_allowed,
+ * mempolicy */
+	spinlock_t alloc_lock;
+
+#ifdef CONFIG_GENERIC_HARDIRQS
+	/* IRQ handler threads */
+	struct irqaction *irqaction;
+#endif
+
+	/* Protection of the PI data structures: */
+	raw_spinlock_t pi_lock;
+
+#ifdef CONFIG_RT_MUTEXES
+	/* PI waiters blocked on a rt_mutex held by this task */
+	struct plist_head pi_waiters;
+	/* Deadlock detection and priority inheritance handling */
+	struct rt_mutex_waiter *pi_blocked_on;
+#endif
+
+#ifdef CONFIG_DEBUG_MUTEXES
+	/* mutex deadlock detection */
+	struct mutex_waiter *blocked_on;
+#endif
+#ifdef CONFIG_TRACE_IRQFLAGS
+	unsigned int irq_events;
+	unsigned long hardirq_enable_ip;
+	unsigned long hardirq_disable_ip;
+	unsigned int hardirq_enable_event;
+	unsigned int hardirq_disable_event;
+	int hardirqs_enabled;
+	int hardirq_context;
+	unsigned long softirq_disable_ip;
+	unsigned long softirq_enable_ip;
+	unsigned int softirq_disable_event;
+	unsigned int softirq_enable_event;
+	int softirqs_enabled;
+	int softirq_context;
+#endif
+#ifdef CONFIG_LOCKDEP
+# define MAX_LOCK_DEPTH 48UL
+	u64 curr_chain_key;
+	int lockdep_depth;
+	unsigned int lockdep_recursion;
+	struct held_lock held_locks[MAX_LOCK_DEPTH];
+	gfp_t lockdep_reclaim_gfp;
+#endif
+
+/* journalling filesystem info */
+	void *journal_info;
+
+/* stacked block device info */
+	struct bio_list *bio_list;
+
+/* VM state */
+	struct reclaim_state *reclaim_state;
+
+	struct backing_dev_info *backing_dev_info;
+
+	struct io_context *io_context;
+
+	unsigned long ptrace_message;
+	siginfo_t *last_siginfo; /* For ptrace use.  */
+	struct task_io_accounting ioac;
+#if defined(CONFIG_TASK_XACCT)
+	u64 acct_rss_mem1;	/* accumulated rss usage */
+	u64 acct_vm_mem1;	/* accumulated virtual memory usage */
+	cputime_t acct_timexpd;	/* stime + utime since last update */
+#endif
+#ifdef CONFIG_CPUSETS
+	nodemask_t mems_allowed;	/* Protected by alloc_lock */
+	int mems_allowed_change_disable;
+	int cpuset_mem_spread_rotor;
+	int cpuset_slab_spread_rotor;
+#endif
+#ifdef CONFIG_CGROUPS
+	/* Control Group info protected by css_set_lock */
+	struct css_set __rcu *cgroups;
+	/* cg_list protected by css_set_lock and tsk-&gt;alloc_lock */
+	struct list_head cg_list;
+#endif
+#ifdef CONFIG_FUTEX
+	struct robust_list_head __user *robust_list;
+#ifdef CONFIG_COMPAT
+	struct compat_robust_list_head __user *compat_robust_list;
+#endif
+	struct list_head pi_state_list;
+	struct futex_pi_state *pi_state_cache;
+#endif
+#ifdef CONFIG_PERF_EVENTS
+	struct perf_event_context *perf_event_ctxp[perf_nr_task_contexts];
+	struct mutex perf_event_mutex;
+	struct list_head perf_event_list;
+#endif
+#ifdef CONFIG_NUMA
+	struct mempolicy *mempolicy;	/* Protected by alloc_lock */
+	short il_next;
+#endif
+	atomic_t fs_excl;	/* holding fs exclusive resources */
+	struct rcu_head rcu;
+
+	/*
+	 * cache last used pipe for splice
+	 */
+	struct pipe_inode_info *splice_pipe;
+#ifdef	CONFIG_TASK_DELAY_ACCT
+	struct task_delay_info *delays;
+#endif
+#ifdef CONFIG_FAULT_INJECTION
+	int make_it_fail;
+#endif
+	struct prop_local_single dirties;
+#ifdef CONFIG_LATENCYTOP
+	int latency_record_count;
+	struct latency_record latency_record[LT_SAVECOUNT];
+#endif
+	/*
+	 * time slack values; these are used to round up poll() and
+	 * select() etc timeout values. These are in nanoseconds.
+	 */
+	unsigned long timer_slack_ns;
+	unsigned long default_timer_slack_ns;
+
+	struct list_head	*scm_work_list;
+#ifdef CONFIG_FUNCTION_GRAPH_TRACER
+	/* Index of current stored address in ret_stack */
+	int curr_ret_stack;
+	/* Stack of return addresses for return function tracing */
+	struct ftrace_ret_stack	*ret_stack;
+	/* time stamp for last schedule */
+	unsigned long long ftrace_timestamp;
+	/*
+	 * Number of functions that haven't been traced
+	 * because of depth overrun.
+	 */
+	atomic_t trace_overrun;
+	/* Pause for the tracing */
+	atomic_t tracing_graph_pause;
+#endif
+#ifdef CONFIG_TRACING
+	/* state flags for use by tracers */
+	unsigned long trace;
+	/* bitmask of trace recursion */
+	unsigned long trace_recursion;
+#endif /* CONFIG_TRACING */
+#ifdef CONFIG_CGROUP_MEM_RES_CTLR /* memcg uses this to do batch job */
+	struct memcg_batch_info {
+		int do_batch;	/* incremented when batch uncharge started */
+		struct mem_cgroup *memcg; /* target memcg of uncharge */
+		unsigned long bytes; 		/* uncharged usage */
+		unsigned long memsw_bytes; /* uncharged mem+swap usage */
+	} memcg_batch;
+#endif
+#ifdef CONFIG_HAVE_HW_BREAKPOINT
+	atomic_t ptrace_bp_refcnt;
+#endif
+};</code></pre>
+<blockquote>
+<p>在这个task<em>struct的结构体中，那么其中的位域是用来记录进程运行的状态的。</p>
+<p>下面的代码中，我们通过模块编程来看下我们当前系统中运行的进程</p>
+<p>文件名为 tasklist.c</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>
+//-------------------------------------------------------------------
+//	tasklist.c
+//
+//	This module creates a pseudo-file (named '/proc/tasklist')
+//	that will display a list of all the system's active tasks.
+//
+//	NOTE: Written and tested with Linux kernel version 2.6.22.
+//
+//	programmer: ALLAN CRUSE
+//	written on: 05 SEP 2004
+//-------------------------------------------------------------------
+
+#include &lt;linux/module.h&gt;	// for init_module() 
+#include &lt;linux/proc_fs.h&gt;	// for create_proc_info_entry() 
+#include &lt;linux/sched.h&gt;	// for init_task
+
+char modname[] = "tasklist";
+struct task_struct  *task;
+int  n_elt;			// 'global' so value will be retained
+
+int my_get_info( char *buf, char **start, off_t offset,int count ,int * eof,void *data)
+{
+	int	len = 0;	// reinitialized on each reentry 
+
+	if ( offset == 0 )	// first time through this procedure
+		{
+		task = &amp;init_task;	// starting list-element
+		n_elt = 0;		// starting count-value
+		}
+	else if ( task == &amp;init_task ) return 0;  // end-of-file
+	
+	len += sprintf( buf+len, "#%-3d ", ++n_elt );
+	len += sprintf( buf+len, "%5d ", task-&gt;pid );
+	len += sprintf( buf+len, "%lu ", task-&gt;state );
+	len += sprintf( buf+len, "%-15s ", task-&gt;comm );
+	len += sprintf( buf+len, "\n" );
+
+	task = next_task( task );	// the 'next' list-element
+
+	*start = buf;		// be sure to 'reenter' this procedure
+	return	len;		// as long as return-value is non-zero
+}
+
+int __init my_init( void )
+{
+	printk( "&lt;1&gt;\nInstalling \'%s\' module\n", modname );
+	create_proc_read_entry( modname, 0, NULL, my_get_info,NULL);
+	return	0;  //SUCCESS
+}
+
+void __exit my_exit( void )
+{
+	remove_proc_entry( modname, NULL );
+	printk( "&lt;1&gt;Removing \'%s\' module\n", modname );
+}
+
+module_init(my_init);
+module_exit(my_exit);
+MODULE_LICENSE("GPL");</code></pre>
+<blockquote>
+<p>运行程序：</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>$./mmake tasklist.c 
+$sudo insmod tasklist.ko
+$ cat /proc/tasklist</code></pre>
+<blockquote>
+<p><img src="http://uliweb.clkg.org/uploads/tutorials/11/2fda9984eb3b11e19b48f23c91df0780.png"&gt;</p>
+</blockquote>
+<blockquote><p>task_struct 不止表示进程，其实进程和线程都是由它表示的。 上面的module得到的确实是进程信息。next<em>task取得是task</em>struct的tasks，只有线程组的leader才会链入这个链表。   下面我们通过修改，让线程组中的除leader之外的线程的信息显示出来。  看下面的code</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>        //-------------------------------------------------------------------
+    // tasklist.c
+    //
+    // This module creates a pseudo-file (named '/proc/tasklist')
+    // that will display a list of all the system's active tasks.
+    //
+    // NOTE: Written and tested with Linux kernel version 2.6.22.
+    //
+    // programmer: ALLAN CRUSE
+    // written on: 05 SEP 2004
+    //-------------------------------------------------------------------
+
+#include &lt;linux/module.h&gt;	// for init_module()
+#include &lt;linux/proc_fs.h&gt;	// for create_proc_info_entry()
+#include &lt;linux/sched.h&gt;	// for init_task
+
+char modname[] = "tasklist";
+struct task_struct *task;
+int n_elt;			// 'global' so value will be retained
+
+int
+my_get_info (char *buf, char **start, off_t offset, int count, int *eof,
+	     void *data)
+{
+  int len = 0;			// reinitialized on each reentry
+  if (offset == 0)		// first time through this procedure
+    {
+      task = &amp;init_task;	// starting list-element
+      n_elt = 0;		// starting count-value
+    }
+  else if (task == &amp;init_task)
+    return 0;			// end-of-file
+  len += sprintf (buf + len, "#%-3d ", ++n_elt);
+  len += sprintf (buf + len, "%5d ", task-&gt;pid);
+  len += sprintf (buf + len, "%lu ", task-&gt;state);
+  len += sprintf (buf + len, "%-15s ", task-&gt;comm);
+  len += sprintf (buf + len, "\n");
+    
+  task = next_thread(task);
+  if(task == task-&gt;group_leader)
+      task = next_task (task);	// the 'next' list-element
+
+  *start = buf;			// be sure to 'reenter' this procedure
+  return len;			// as long as return-value is non-zero
+}
+
+int __init
+my_init (void)
+{
+  printk ("&lt;1&gt;\nInstalling \'%s\' module\n", modname);
+  create_proc_read_entry (modname, 0, NULL, my_get_info, NULL);
+  return 0;			//SUCCESS
+}
+
+void __exit
+my_exit (void)
+{
+  remove_proc_entry (modname, NULL);
+  printk ("&lt;1&gt;Removing \'%s\' module\n", modname);
+}
+
+module_init (my_init);
+module_exit (my_exit);
+MODULE_LICENSE ("GPL");</code></pre>
+<blockquote><p>请注意查看上面添加了哪些代码。</p>
+</blockquote>
+<p>&gt;上面的模块把内核中进程与线程所有的信息都显示出来了，读者会想如果我只想显示线程的信息呢，那么请继续看 &gt;下面的代码</p>
+<pre class="prettyprint linenums pre-scrollable"><code>    //-------------------------------------------------------------------
+    // tasklist.c
+    //
+    // This module creates a pseudo-file (named '/proc/tasklist')
+    // that will display a list of all the system's active tasks.
+    //
+    // NOTE: Written and tested with Linux kernel version 2.6.22.
+    //
+    // programmer: ALLAN CRUSE
+    // written on: 05 SEP 2004
+    //-------------------------------------------------------------------
+
+#include &lt;linux/module.h&gt;	// for init_module()
+#include &lt;linux/proc_fs.h&gt;	// for create_proc_info_entry()
+#include &lt;linux/sched.h&gt;	// for init_task
+
+char modname[] = "tasklist";
+struct task_struct *task;
+int n_elt;			// 'global' so value will be retained
+
+int
+my_get_info (char *buf, char **start, off_t offset, int count, int *eof,
+	     void *data)
+{
+  int len = 0;			// reinitialized on each reentry
+  if (offset == 0)		// first time through this procedure
+    {
+      task = &amp;init_task;	// starting list-element
+      n_elt = 0;		// starting count-value
+    }
+  else if (task == &amp;init_task)
+    return 0;			// end-of-file
+
+  if(task-&gt;mm == 0)
+  {    
+    len += sprintf (buf + len, "#%-3d ", ++n_elt);
+    len += sprintf (buf + len, "%5d ", task-&gt;pid);
+    len += sprintf (buf + len, "%lu ", task-&gt;state);
+    len += sprintf (buf + len, "%-15s ", task-&gt;comm);
+    len += sprintf (buf + len, "\n");
+ }
+    
+  task = next_thread(task);
+  if(task == task-&gt;group_leader)
+      task = next_task (task);	// the 'next' list-element
+
+  *start = buf;			// be sure to 'reenter' this procedure
+  return len;			// as long as return-value is non-zero
+}
+
+int __init
+my_init (void)
+{
+  printk ("&lt;1&gt;\nInstalling \'%s\' module\n", modname);
+  create_proc_read_entry (modname, 0, NULL, my_get_info, NULL);
+  return 0;			//SUCCESS
+}
+
+void __exit
+my_exit (void)
+{
+  remove_proc_entry (modname, NULL);
+  printk ("&lt;1&gt;Removing \'%s\' module\n", modname);
+}
+
+module_init (my_init);
+module_exit (my_exit);
+MODULE_LICENSE ("GPL");</code></pre>
+<blockquote><p>读者看到上面代码的改动了，原来线程是没有自已独立的内存空间，通过上面的例子想必读者对于线程与进程有一定的 认识了吧。。。</p>
+</blockquote>
+
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/85?para=0" class="para-comments-count active right animated">0</a>
+                            <span class="gray">valley 于 2012-09-23 11:51:09+00:00 更新</span>
+                        </p>
+                    </div>
+                    
+                    <!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1342595503212835&type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<script src="http://mediaplayer.yahoo.com/js"></script>
+
+                
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
+                    </div>
+                
+                    <div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/81.html"><i class="icon-arrow-left"></i> 2.3 内核模块之PROC文件系统</a>
+                    </div>
+                    <div class="chapter-next chapter-down animated">
+                        <a next-chapter href="/tutorial/view_chapter/90.html">2.5 内核模块之链表 <i class="icon-arrow-right"></i></a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        <div class="span3" id="right-side">
+            
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<style>
+#toc {top:140px;}
+</style>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    /*(function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    */
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        //$('body').scrollspy({target:'#titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/85',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/85?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                        //处理toTop
+                        reset_totop();
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                        //处理toTop
+                        reset_totop();
+                    }
+                });
+                
+            }
+        });
+        /*
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        */
+        
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
+        //増加限制目录区高度的处理
+        //$('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        //$('#titles a').anchorScroll({offset:50});
+        
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
+        });
+        
+        
+        //増加代码提示
+        $('pre, .inline-tag').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
+        
+    });
+</script>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+<!-- bottomlinks -->
+<script>$.ajaxSetup({cache:false, traditional:true});</script>
+<script type="text/javascript" src="/static/pageslide/jquery.pageslide.js?ver=2"></script>
+<script type="text/javascript" src="/static/toc/toc.js?ver=2"></script>
+
+
+  </body>
+</html>

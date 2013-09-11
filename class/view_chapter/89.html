@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel) - 内核模块之文件系统</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/asset/prettify.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/asset/prettify.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/pageslide/jquery.pageslide.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.form.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/toc/toc.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/fontawesome/css/font-awesome.css?ver=2"/>
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/bootstrap/fontawesome/css/font-awesome-ie7.css">
+<![endif]-->
+
+<script type="text/javascript" src="/static/tutorials/comment.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/ui.totop.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.ui.totop.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jquery.hotkeys.js?ver=2"></script>
+    
+    
+  </head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#pageslide {
+width:320px;
+}
+#toc {width:22%;}
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                内核模块之文件系统
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span9" id="article">
+            <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+      chromium.org/developers/how-tos/chrome-frame-getting-started -->
+ <!--[if lt IE 8]><div class="alert alert-info">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</div><![endif]-->
+
+            <div class="outter">
+                <div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/88.html"><i class="icon-arrow-left"></i> 2.12 内核模块之系统调用</a>
+                </div>
+                <div class="chapter-next chapter-top animated">
+                    <a next-chapter href="/tutorial/view_chapter/91.html">3 一步一步写驱动模块 <i class="icon-arrow-right"></i></a>
+                </div>
+                <div class="expander">&raquo;</div>
+                <div class="content-inner rounded_bottom article">
+                    <h1>内核模块之文件系统</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/89?para=0" class="para-comments-count active right animated">0</a> -->
+                            <span class="gray">valley 于 2012-10-11 01:39:15+00:00 更新</span>
+                            <span class="label label-info">访问次数：315</span>
+                        
+                    </div>
+                    
+                    
+                
+                    <blockquote><p>虚拟文件系统(VFS)</p>
+<p>在我看来, "虚拟"二字主要有两层含义:</p>
+<p>1, 在同一个目录结构中, 可以挂载着若干种不同的文件系统. VFS隐藏了它们的实现细节, 为使用者提供统一的接口;</p>
+<p>2, 目录结构本身并不是绝对的, 每个进程可能会看到不一样的目录结构. 目录结构是由"地址空间(namespace)"来描述的, 不同的进程可能拥有不同的namespace, 不同的namespace可能有着不同的目录结构(因为它们可能挂载了不同的文件系统).</p>
+<p>操作已打开的文件</p>
+<p>VFS的使用者是进程(用户访问文件系统总是需要启动进程). 描述进程的task_struct结构中files指针指向了一个files_struct结构, 后者描述了进程已打开的文件集合.</p>
+<p>files_struct结构维护了一个已打开文件所对应的file结构的指针数组, 数组下标被用作用户程序操作已打开文件的句柄(通常称作fd). files_struct还维护着已使用的fd位图, 以便在需要打开文件时, 为其分配一个未使用的fd.</p>
+<p>file结构是一个已打开文件实例. 用户程序通过fd操作一个已打开文件的过程比较简单, 由fd索引到对应的file结构, 再执行file结构的f_op中对应的操作即可(比如read, write).</p>
+<p>不同的file结构可能拥有不同的f_op, 因为它们的文件类型不同(比如, 普通文件, socket, fifo, 等等).</p>
+<p>而这个对应的f_op是在文件打开时被赋值的, 对于已打开的文件, 只管使用f_op中的函数即可, 不用再判断到底这个文件是什么类型. 而至于具体的f_op中的函数是如何实现的, 本文不作描述(实际上这一部分也是很复杂的, 参见<linux内核文件读写浅析>).</p>
+<p>用户程序操作一个已打开的文件也未必就会调用到f_op中的函数, 有些操作是只涉及file结构本身的. 比如file结构中维护了文件的当前位置(f_pos), lseek系统调用只负责移动这个pos值.</p>
+<p>类似f_pos, f_mode(文件的访问模式), 等这样的属性, 是存放在file结构中的, 这意味着这些属性都是跟一个已打开文件的实例相关的. 一个文件可能会打开多个实例(在一个或多个进程中), 每个实例中的这些值都有可能不同.</p>
+<p>比如, 两个进程同时打开同一个文件, 进行读操作. 由于两个实例(file结构)对应的f_pos不同, 两个读操作互不影响.</p>
+<p>而有时候多个进程也会共享同一个打开文件实例, 当使用clone系统调用创建子进程时, 如果设置了CLONE_FILES标志, 则父子进程将共享files_struct结构, 从而共享全部已打开的文件实例. 典型的例子是多线程.</p>
+<p>打开文件</p>
+<p>相比于对已打开文件的操作的简单, 打开一个文件的过程却是很复杂的. 从上面的图中也可以看出, 操作已打开的文件只占了很少的篇幅, 而其他的内容则都与打开文件有关.</p>
+<p>要打开一个文件, 首先需要文件路径, 如"dir0/dir1/file". 这个路径被'/'拆分成多级, 每一级都是一个文件(目录也是文件, 如dir0, dir1).</p>
+<p>在寻找这个文件路径的一开始, 我们需要一个起点. 如果文件路径以'/'开头, 则以根目录为起点; 否则以当前路径为起点.</p>
+<p>这两个可能的起点都保存在进程的task_struct所对应的fs_struct结构中. 每个文件在目录结构中由目录项(dentry)结构来表示, "起点"本身也是一个dentry结构.</p>
+<p>我们在shell中执行cd命令时, 实际上就是改变了fs_struct结构中代表当前路径的那个dentry.</p>
+<p>进程也可以通过chroot系统调用来改变fs_struct结构中代表根路径的那个dentry. 这样一来, 这个dentry之上的那些路径对该进程将不可见.</p>
+<p>作为文件的索引结构, 若干dentry描绘了一个树型的目录结构, 这就是用户所看到的目录结构. (我们暂且将其称为dentry树.)</p>
+<p>每个dentry指向一个索引节点(inode)结构, 后者才是实际描述这个文件信息的结构. 而多个dentry可以指向同一个inode, 这样就实现了link.</p>
+<p>dentry中实现了一组方法(d_op), 主要是用于匹配子节点. dentry实现了一个散列表, 以便于查找子节点.</p>
+<p>d_op可能随文件系统类型的不同而不同, 比如, 散列方法可能不同, 节点的匹配方法也可能不同(有的文件系统文件名大小写敏感, 有的则不).</p>
+<p>寻找文件路径的过程就是在这个dentry树中不断查找子dentry, 直到找到路径中的最后一个dentry的过程.</p>
+<p>虽然dentry树描绘了文件系统的目录结构, 但是, 这些dentry结构并不是常驻内存的. 整个目录结构可能会非常大, 以致于内存根本装不下.</p>
+<p>初始状态下, 系统中只有代表根目录的dentry和它所指向的inode(这是在根文件系统挂载时生成的, 见下文). 此时要打开一个文件, 文件路径中对应的节点都是不存在的, 根目录的dentry无法找到需要的子节点(它现在还没有子节点). 这时候就要通过inode->i_op中的lookup方法来寻找需要的inode的子节点(这往往是通过特定的文件系统类型定义的方法, 从文件系统存储介质中去查找的。参见《linux文件系统实现浅析》), 找到以后(此时inode已被载入内存), 再创建一个dentry与之关联上.</p>
+<p>由这一过程可见, 其实是先有inode再有dentry. inode本身是存在于文件系统的存储介质上的, 而dentry则是在内存中生成的. dentry的存在加速了对inode的查询.</p>
+<p>既然整个目录结构可能不能全部载入内存, 在内存中生成的dentry将在无人使用时被释放. d_count字段记录了dentry的引用计数, 引用为0时, dentry将被释放.</p>
+<p>这里所谓的释放dentry并不是直接销毁并回收, 而是将dentry放入一个"最近最少使用(LRU)"队列(与对应的超级块相关联). 当队列过大, 或系统内存紧缺时, 最近最少使用的一些dentry才真正被释放.</p>
+<p>这个LRU队列就像是一个缓存池, 加速了对重复的路径的访问. 而当dentry被真正释放时, 它所对应的inode将被减引用. 如果引用为0, inode也被释放.</p>
+<p>当寻找一个文件路径时, 对于其中经历的每一个节点, 有三种情况:</p>
+<p>1, 对应的dentry引用计数尚未减为0, 它们还在dentry树中, 直接使用即可;</p>
+<p>2, 如果对应的dentry不在dentry树中, 则试图从LRU队列去寻找. LRU队列中的dentry同时被散列到一个散列表中, 以便查找. 查找到需要的dentry后, 这个dentry被从LRU队列中拿出来, 重新添加到dentry树中;</p>
+<p>3, 如果对应的dentry在LRU队列中也找不到, 则只好去文件系统的存储介质里面查找inode了. 找到以后dentry被创建, 并添加以dentry树中;</p>
+<p>文件系统挂载</p>
+<p>VFS允许多种不同的文件系统挂载在同一个目录结构中, 文件系统挂载的路径称为挂载点.</p>
+<p>如, 磁盘有两个分区A和B, A作为根文件系统被挂载在"/"路径下, 而B作为A的子文件系统, 挂载在"/mnt/B/"下.</p>
+<p>要完成这一挂载, A文件系统中必须有"/mnt/"这个目录. 而不管A中有没有"/mnt/B", 都会生成一个dentry与之对应, 但是这个dentry并不对应A中的"/mnt/B"所对应的inode(即使这个inode存在). 这个dentry中的d_mounted标记被置位, 表示这是一个挂载点.</p>
+<p>如果在寻找文件路径的过程中遇到这样的一个挂载点, 则代表当前路径的指针将从当前dentry切换到挂载的文件系统的"/"所对应的dentry. 即是说, 访问A分区中的"/mnt/B"这个路径时, 实际访问到的是B分区中的"/"路径.</p>
+<p>文件系统使用vfsmount结构来描述, 多个挂载的文件系统也被组织成树型结构.</p>
+<p>vfsmount结构中有两个指向dentry的指针, mnt_mountpoint指向其父文件系统的挂载点dentry(例如A分区中的"/mnt/B"), 而mnt_root指向本文件系统的根路径dentry(例如B分区中的"/"). 通过这两个指针, 可以完成上面提到的当前路径的切换.</p>
+<p>于是, 寻找文件路径的过程中, 除了要记录当前dentry, 还要记录当前vfsmount. 如果当前dentry是一个挂载点, 则通过当前vfsmount, 找到其儿子中挂载点为当前dentry的子vfsmount, 然后得到这个子vfsmount的mnt_root.</p>
+<p>可能会有多个vfsmount都挂载在同一个dentry上, 这时候, 只有其中一个vfsmount会被选中, 而其他vfsmount将被隐藏. 直到被选中的那个vfsmount被卸载后, 被隐藏的vfsmount才可能被选中. 利用这个特点, 我们可以实现目录的隐藏. 比如/home/kouu/secret下保存着一些不希望别人看到的文件, 可以在这个目录上mount一下tmpfs, 以达到隐藏的目的.</p>
+<p>子文件系统总是被挂载在父文件系统的某个dentry上, 而根文件系统则是由mnt_namespace对象来引用的. 不同的mnt_namespace可以引用不同的根文件系统, 组织不同的文件系统挂载树, 形成不同的目录结构.</p>
+<p>一般而言, 新创建的进程总是与其父进程共用mnt_namespace. 而所有进程都是1号进程(init)的子孙进程, 则一般情况下所有进程都使用相同的mnt_namespace, 都生活在相同的目录结构中.</p>
+<p>但是在通过clone系统调用创建新进程时, 可以指定CLONE_NEWNS标志, 为子进程创建新的名字空间(其中就包含了mnt_namespace, 此外名字空间还有其他内容).</p>
+<p>前面只是说某个设备被挂载, 其实挂载文件系统除了要添加相应的存储介质的设备文件, 还要在内核中注册文件系统类型(对应file_system_type结构)(如ext2, ext3, tmpfs). 一个文件系统总是包含设备和类型两个要素的.</p>
+<p>已注册file_system_type被存储在链表结构中, 通过它们注册的名字(比如ext3)来找到它们. 它们是文件数据的解释器, 解释设备文件所对应的物理存储介质中的数据.</p>
+<p>每个文件系统都有一个超级块(对应super_block结构), 这个超级块通过file_system_type结构的get_sb方法从块设备中读出来.</p>
+<p>而一个文件系统可以被挂载多次, 形成多个vfsmount结构. 它们都对应同一个super_block. 实际上只有文件系统第一次被挂载时, 才会去读它的super_block. 否则这个super_block已经是存在的, 直接引用即可.</p>
+<p>在get_sb的过程中, 这个文件系统的根路径所对应的inode也会从存储介质中载入, 并创建对应的dentry. super_block->s_root就指向根路径的dentry.</p>
+<p>数据结构总结</p>
+<p>最后, 我们对上面的一些数据结构及其函数指针集合进行一下整理, 这些东西实在容易让人找不着北.</p>
+<p>file_system_type</p>
+<p>含义: 文件系统类型, 如ext2, ext3, 等等</p>
+<p>创建: 内核启动或内核模块加载时, 为每一种文件系统类型创建一个对应的file_system_type结构</p>
+<p>函数: get_sb, 获取超级块的方法. 在注册文件系统类型时提供</p>
+<p>super_block</p>
+<p>含义: 超级块, 对应一个存储文件的设备</p>
+<p>创建: 文件系统挂载时, 通过对应的file_system_type->get_sb从设备中读取, 并初始化(可见, super_block结构中一部分信息是保存在设备中的, 一部分则是在内在中初始化的)</p>
+<p>函数: s_op, 超级块的函数集, 主要包含对索引节点和文件系统实例的操作. file_system_type->get_sb从设备中读取超级块后, 用file_system_type对应的特定函数集进行初始化</p>
+<p>inode</p>
+<p>含义: 索引节点, 对应设备上存放的一个文件</p>
+<p>创建: 1)在超级块被载入时, 作为根的inode一并被载入; 2)通过mknod调用创新新的索引节点; 3)在寻找文件路径的过程中, 从设备中读取, 并初始化(跟super_block一样, inode结构中一部分信息是保存在设备中的, 一部分则是在内在中初始化的)</p>
+<p>函数: i_op, 索引节点函数集, 主要包含对子inode的创建, 删除等操作. f_op, 文件函数集, 主要包含对本inode的读写等操作. 在inode被创建后, 1)如果是特殊文件, 则根据对应文件的类型(包括块设备, 字符设备, fifo, 等等)赋予特定的函数集(并不直接与设备和文件系统类型相关); 2)否则, 对应的文件系统类型会提供相应的函数集, 并且目录和文件函数集很可能不同</p>
+<p>dentry</p>
+<p>含义: 目录项, 寻找文件路径的过程中使用的树型结构, 与inode关联</p>
+<p>创建: inode被创建后, dentry就要被创建并初始化</p>
+<p>函数: d_op, 目录项函数集, 主要包含对子dentry的查询操作. 由文件系统类型确定</p>
+<p>file</p>
+<p>含义: 打开文件的实例</p>
+<p>创建: 在open调用时创建, 并与一个inode对应</p>
+<p>函数: f_op, 文件读写等操作. 1)等于inode->f_op, 对于普通文件, 块设备文件, 等; 2)由inode->f_op->open函数在文件打开时指定, 典型的情况是字符设备. 所有字符设备具有相同的inode->f_op, 在inode->f_op->open过程中, 找到对应设备驱动注册的f_op, 赋给file->f_op</p>
+</blockquote>
+
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/89?para=0" class="para-comments-count active right animated">0</a>
+                            <span class="gray">valley 于 2012-10-11 01:39:15+00:00 更新</span>
+                        </p>
+                    </div>
+                    
+                    <!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1342595503212835&type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<script src="http://mediaplayer.yahoo.com/js"></script>
+
+                
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
+                    </div>
+                
+                    <div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/88.html"><i class="icon-arrow-left"></i> 2.12 内核模块之系统调用</a>
+                    </div>
+                    <div class="chapter-next chapter-down animated">
+                        <a next-chapter href="/tutorial/view_chapter/91.html">3 一步一步写驱动模块 <i class="icon-arrow-right"></i></a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        <div class="span3" id="right-side">
+            
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<style>
+#toc {top:140px;}
+</style>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    /*(function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    */
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        //$('body').scrollspy({target:'#titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/89',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/89?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                        //处理toTop
+                        reset_totop();
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                        //处理toTop
+                        reset_totop();
+                    }
+                });
+                
+            }
+        });
+        /*
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        */
+        
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
+        //増加限制目录区高度的处理
+        //$('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        //$('#titles a').anchorScroll({offset:50});
+        
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
+        });
+        
+        
+        //増加代码提示
+        $('pre, .inline-tag').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
+        
+    });
+</script>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+<!-- bottomlinks -->
+<script>$.ajaxSetup({cache:false, traditional:true});</script>
+<script type="text/javascript" src="/static/pageslide/jquery.pageslide.js?ver=2"></script>
+<script type="text/javascript" src="/static/toc/toc.js?ver=2"></script>
+
+
+  </body>
+</html>

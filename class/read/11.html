@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel)</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<script type="text/javascript" src="/static/tutorials/jquery.liveflex.Tree.js?ver=2"></script>
+    
+    
+  
+<script>$.ajaxSetup({cache:false, traditional:true});</script></head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+<div class="container">
+    <div class="content-outter">
+        
+
+
+
+
+<style type="text/css">
+.over{outline:solid 1px #afa}
+.on{border:solid 1px green;}
+.below{border-bottom:solid 2px #f00;}
+.below span{}
+.above{border-top:solid 2px #f00;}
+.tree_hover{background:#ccc}
+.ui-droppable {cursor:move;}
+</style>
+
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        目录
+      </li>
+    </ul>
+
+    <div>
+        
+    </div>
+    
+    
+    <ul class="unstyled chapter-list" style="margin-top:18px;" id="titles-list">
+    
+        
+        
+            
+            <li data-id="72" data-order="1">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/72.html" class="chapter-title" id="info-72">内容概要及相关知识的准备</a>
+                    [<span class="small gray">字数:718/评论数:0/访问次数:1409</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:718</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-72').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+            
+                <ul class="unstyled">
+                
+            
+            <li data-id="96" data-order="2">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1.1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/96.html" class="chapter-title" id="info-96">环境配置及说明</a>
+                    [<span class="small gray">字数:199/评论数:0/访问次数:1543</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:199</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-96').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="98" data-order="3">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1.2</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/98.html" class="chapter-title" id="info-98">Linux内核的配置、编译与安装</a>
+                    [<span class="small gray">字数:1748/评论数:4/访问次数:1637</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:1748</li>'
+                            +   '<li><span class="tip-label">评论数</span>:4</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-98').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="97" data-order="4">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1.3</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/97.html" class="chapter-title" id="info-97">内核源代码的目录结构</a>
+                    [<span class="small gray">字数:2509/评论数:1/访问次数:1094</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:2509</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-97').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="73" data-order="5">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1.4</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/73.html" class="chapter-title" id="info-73">Makefile的书写</a>
+                    [<span class="small gray">字数:5125/评论数:9/访问次数:1102</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/uploads/portraits/3.50x50.jpg" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:hejiasheng</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:5125</li>'
+                            +   '<li><span class="tip-label">评论数</span>:9</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-73').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="131" data-order="6">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">1.5</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/131.html" class="chapter-title" id="info-131">源码阅读工具</a>
+                    [<span class="small gray">字数:5294/评论数:1/访问次数:934</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:5294</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-131').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+        
+            </ul>
+        
+    
+            </li>
+        
+            
+            <li data-id="74" data-order="7">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/74.html" class="chapter-title" id="info-74">一步一步写内核模块</a>
+                    [<span class="small gray">字数:62/评论数:0/访问次数:669</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/uploads/portraits/21.50x50.jpg" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:sunsea1026</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:62</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-74').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+            
+                <ul class="unstyled">
+                
+            
+            <li data-id="75" data-order="8">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/75.html" class="chapter-title" id="info-75">内核模块之Hello,World</a>
+                    [<span class="small gray">字数:7734/评论数:4/访问次数:1324</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:7734</li>'
+                            +   '<li><span class="tip-label">评论数</span>:4</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-75').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="78" data-order="9">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.2</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/78.html" class="chapter-title" id="info-78">内核模块之参数传递</a>
+                    [<span class="small gray">字数:5630/评论数:0/访问次数:625</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:7 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:5630</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-78').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="81" data-order="10">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.3</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/81.html" class="chapter-title" id="info-81">内核模块之PROC文件系统</a>
+                    [<span class="small gray">字数:2260/评论数:2/访问次数:635</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:2260</li>'
+                            +   '<li><span class="tip-label">评论数</span>:2</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-81').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="85" data-order="11">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.4</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/85.html" class="chapter-title" id="info-85">内核模块之进程</a>
+                    [<span class="small gray">字数:17637/评论数:3/访问次数:635</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:17637</li>'
+                            +   '<li><span class="tip-label">评论数</span>:3</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-85').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="90" data-order="12">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.5</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/90.html" class="chapter-title" id="info-90">内核模块之链表</a>
+                    [<span class="small gray">字数:3314/评论数:1/访问次数:480</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3314</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-90').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="80" data-order="13">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.6</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/80.html" class="chapter-title" id="info-80">内核模块之内核线程</a>
+                    [<span class="small gray">字数:3124/评论数:3/访问次数:499</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3124</li>'
+                            +   '<li><span class="tip-label">评论数</span>:3</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-80').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="82" data-order="14">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.7</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/82.html" class="chapter-title" id="info-82">内核模块之中断</a>
+                    [<span class="small gray">字数:5559/评论数:2/访问次数:448</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:5559</li>'
+                            +   '<li><span class="tip-label">评论数</span>:2</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-82').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="109" data-order="15">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.8</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/109.html" class="chapter-title" id="info-109">下半部的机制</a>
+                    [<span class="small gray">字数:16526/评论数:0/访问次数:444</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:16526</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-109').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="83" data-order="16">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.9</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/83.html" class="chapter-title" id="info-83">内核模块之定时器</a>
+                    [<span class="small gray">字数:4607/评论数:0/访问次数:442</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:4607</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-83').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="86" data-order="17">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.10</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/86.html" class="chapter-title" id="info-86">内核模块之内存分配</a>
+                    [<span class="small gray">字数:14420/评论数:0/访问次数:491</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:14420</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-86').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="87" data-order="18">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.11</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/87.html" class="chapter-title" id="info-87">内核模块之锁、信号量</a>
+                    [<span class="small gray">字数:6525/评论数:1/访问次数:359</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:6525</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-87').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="88" data-order="19">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.12</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/88.html" class="chapter-title" id="info-88">内核模块之系统调用</a>
+                    [<span class="small gray">字数:17505/评论数:0/访问次数:411</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:17505</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-88').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="89" data-order="20">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">2.13</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/89.html" class="chapter-title" id="info-89">内核模块之文件系统</a>
+                    [<span class="small gray">字数:13158/评论数:0/访问次数:315</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:8 months, 3 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:13158</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-89').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+        
+            </ul>
+        
+    
+            </li>
+        
+            
+            <li data-id="91" data-order="21">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/91.html" class="chapter-title" id="info-91">一步一步写驱动模块</a>
+                    [<span class="small gray">字数:107/评论数:0/访问次数:420</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:107</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-91').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+            
+                <ul class="unstyled">
+                
+            
+            <li data-id="92" data-order="22">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/92.html" class="chapter-title" id="info-92">驱动模块之字符设备</a>
+                    [<span class="small gray">字数:4552/评论数:4/访问次数:426</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:4552</li>'
+                            +   '<li><span class="tip-label">评论数</span>:4</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-92').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="94" data-order="23">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.2</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/94.html" class="chapter-title" id="info-94">驱动模块之cmos</a>
+                    [<span class="small gray">字数:4825/评论数:0/访问次数:380</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 1 week ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:4825</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-94').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="93" data-order="24">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.3</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/93.html" class="chapter-title" id="info-93">驱动模块之串口</a>
+                    [<span class="small gray">字数:3912/评论数:0/访问次数:359</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:5 months, 3 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3912</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-93').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="148" data-order="25">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.4</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/148.html" class="chapter-title" id="info-148">驱动模块之块设备</a>
+                    [<span class="small gray">字数:3/评论数:0/访问次数:237</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-148').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="95" data-order="26">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.5</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/95.html" class="chapter-title" id="info-95">驱动模块之网卡</a>
+                    [<span class="small gray">字数:12762/评论数:1/访问次数:356</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:5 months, 3 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:12762</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-95').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="122" data-order="27">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.6</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/122.html" class="chapter-title" id="info-122">硬件常识</a>
+                    [<span class="small gray">字数:3246/评论数:0/访问次数:308</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3246</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-122').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="136" data-order="28">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">3.7</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/136.html" class="chapter-title" id="info-136">设备模型</a>
+                    [<span class="small gray">字数:179/评论数:1/访问次数:246</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:179</li>'
+                            +   '<li><span class="tip-label">评论数</span>:1</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-136').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+        
+            </ul>
+        
+    
+            </li>
+        
+            
+            <li data-id="100" data-order="29">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">4</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/100.html" class="chapter-title" id="info-100">其它</a>
+                    [<span class="small gray">字数:48/评论数:0/访问次数:239</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:48</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-100').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+            
+                <ul class="unstyled">
+                
+            
+            <li data-id="104" data-order="30">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">4.1</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/104.html" class="chapter-title" id="info-104">汇编</a>
+                    [<span class="small gray">字数:3735/评论数:0/访问次数:357</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 4 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:3735</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-104').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="101" data-order="31">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">4.2</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/101.html" class="chapter-title" id="info-101">Elf格式编程</a>
+                    [<span class="small gray">字数:1453/评论数:0/访问次数:521</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:9 months, 4 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:1453</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-101').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+            
+            <li data-id="110" data-order="32">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">4.3</span>&nbsp;&nbsp;
+                    
+                    <a href="/tutorial/view_chapter/110.html" class="chapter-title" id="info-110">cat 命令的实现</a>
+                    [<span class="small gray">字数:1337/评论数:0/访问次数:518</span>]
+                    <i class="icon-file" title="文章"></i>
+                    
+                    
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="/static/images/user50x50.jpg?ver=2" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:valley</li>'
+                            +   '<li><span class="tip-label">更新于</span>:10 months, 2 weeks ago</li>'
+//                            +   '<li><span class="tip-label">字数</span>:1337</li>'
+                            +   '<li><span class="tip-label">评论数</span>:0</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-110').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt,
+                                html:true,
+                                trigger:'hover'
+                            });
+                        });
+                    </script>
+                    
+                </div>
+                
+        
+        
+        
+    
+            </li>
+        
+        
+            </ul>
+        
+    
+            </li>
+        
+        
+    
+    </ul>
+
+    </div>    
+</div>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+
+  </body>
+</html>

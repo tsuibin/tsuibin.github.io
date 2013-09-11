@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Uliweb Zone - 教程 - 一步一步学内核(Linux kernel) - 内核模块之中断</title>
+    <!-- toplinks -->
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.2.0/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.2.0/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/asset/prettify.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/asset/prettify.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/pageslide/jquery.pageslide.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.form.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/toc/toc.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/fontawesome/css/font-awesome.css?ver=2"/>
+<!--[if IE 7]>
+  <link rel="stylesheet" href="/static/bootstrap/fontawesome/css/font-awesome-ie7.css">
+<![endif]-->
+
+<script type="text/javascript" src="/static/tutorials/comment.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/ui.totop.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jquery.ui.totop.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jquery.hotkeys.js?ver=2"></script>
+    
+    
+  </head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Uliweb Zone</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>Home</span></a></li><li><a href="/forum"><span>Forum</span></a></li><li class="active"><a href="/tutorial"><span>Tutorial</span></a></li><li><a href="/class"><span>Class</span></a></li><li><a href="/user/view"><span>Admin</span></a></li><li><a href="/about"><span>About</span></a></li>
+
+
+
+</ul>
+
+      
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
+    
+
+    
+        <p class="pull-right user_info">
+            <a href="/login">登录</a> | <a href="/register">注册</a>
+        </p>
+    
+
+    
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+#pageslide {
+width:320px;
+}
+#toc {width:22%;}
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/11.html">一步一步学内核(Linux kernel)</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                内核模块之中断
+              </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span9" id="article">
+            <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+      chromium.org/developers/how-tos/chrome-frame-getting-started -->
+ <!--[if lt IE 8]><div class="alert alert-info">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</div><![endif]-->
+
+            <div class="outter">
+                <div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/80.html"><i class="icon-arrow-left"></i> 2.6 内核模块之内核线程</a>
+                </div>
+                <div class="chapter-next chapter-top animated">
+                    <a next-chapter href="/tutorial/view_chapter/109.html">2.8 下半部的机制 <i class="icon-arrow-right"></i></a>
+                </div>
+                <div class="expander">&raquo;</div>
+                <div class="content-inner rounded_bottom article">
+                    <h1>内核模块之中断</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/82?para=0" class="para-comments-count active right animated">0</a> -->
+                            <span class="gray">valley 于 2012-09-19 02:59:10+00:00 更新</span>
+                            <span class="label label-info">访问次数：448</span>
+                        
+                    </div>
+                    
+                    
+                
+                    <blockquote><p>中断通常分为同步中断和异步中断:</p>
+<p>同步中断：是当指令执行时由CPU控制单元产生，之所以称之为同步，是因为只有在一条指令终止执行后CPU才会</p>
+<p>发出中断</p>
+<p>异步中断：是由其它硬件设备依照CPU时钟信号随机产生。</p>
+<p>通常把同步中断称之为异常，把异步中断称之为中断</p>
+<p>中断也为两种：</p>
+<p>可屏蔽中断：I/O设备发出的所有中断请求（IRQ）都产生可屏蔽中断。</p>
+<p>非屏蔽中断：只有几个危急的事件（如硬件故障）才引起非屏蔽中断。非屏蔽中断总是由CPU辩认的。</p>
+<p>异常（fault)：根据CPU控制单元产生异常时保存在内核态堆栈eip寄存器的值分为以下三种：</p>
+<p>故障：通常是可以纠正的，一旦纠正，程序就可以在不失连贯性的情况下重新开始。保存在eip中的值是引起故障</p>
+<p>的指令地址。因此，当异常处理程序终止时，那系着指令会被重新执行。（比如缺页）</p>
+<p>陷阱(trap)：在陷阱指令执行后立即报告；内核把控制权返回给程序后就可以继续它的执行而不失连贯性何存在eip</p>
+<p>中的值是一个随后要执行地址。只有当没有必要重新执行已终止的指令时，才触发陷阱。陷阱的主要用途是为了调试</p>
+<p>程序。在这种情况下，中断信号的作用是通知调试程序一条特殊指令已经执行（例如到了一个程序内的断点）。</p>
+<p>一旦用户检查到调试程序所提供的数据，她就可能要求被调试程序从下一条指令重新开始执行。</p>
+<p>异常终止：发生一个严重的错误，控制单元出了问题，不能在eip寄存器中保存引起异常指令所在的确切位置。异常</p>
+<p>中止用于报告严重的错误，如硬件故障或系统中无效的值或不一致的值。由控制单元发送的这个中断信号是紧急信号</p>
+<p>，用来把控制权切换到相应的异常中止处理程序，这个异常中止处理程序除了受强制影响的进程终止外，没有别的选择。</p>
+<p>与Linux设备驱动中中断处理相关的首先是申请与释放IRQ的API request_irq()和free<em>irq()，</p>
+<p>request_irq()的原型为：</p>
+<p>int request_irq(unsigned int irq, void (<em>handler)(int irq, void </em>dev_id, struct pt_regs <em>regs), unsigned long irqflags, const char * devname, void </em>dev_id);</p>
+<p>irq是要申请的硬件中断号；</p>
+<p>handler是向系统登记的中断处理函数，是一个回调函数，中断发生时，系统调用这个函数，dev<em>id参数将被传递；</p>
+<p>irqflags是中断处理的属性，若设置SA<em>INTERRUPT，标明中断处理程序是快速处理程序，快速处理程序被调用时屏蔽所有中断，慢速处理程 序不屏蔽；若设置SA</em>SHIRQ，则多个设备共享中断，dev<em>id在中断共享时会用到，一般设置为这个设备的device结构本身或者NULL。</p>
+<p>free_irq()的原型为：</p>
+<p>void free_irq(unsigned int irq,void <em>dev_id);</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>#include &lt;linux/module.h&gt;
+#include &lt;linux/init.h&gt;
+#include &lt;linux/interrupt.h&gt;
+
+static int irq;
+static char * interface;
+
+module_param(interface,charp,0644);
+module_param(irq,int ,0644);
+
+static irqreturn_t myinterrupt(int irq,void * dev_id)
+{
+	static int mycount = 0;
+	static long mytime = 0;
+	//struct net_device * dev = (struct net_device *)dev_id;
+
+	if(mycount == 0) {
+		mytime = jiffies;
+	}
+
+	if(mycount &lt; 10) {
+		mytime = jiffies - mytime;
+		printk("interrupt number %d --intterval(jiffies) %ld --jiffies:%ld \n",irq,mytime,jiffies);
+	mytime = jiffies;
+	}
+
+	mycount ++;
+
+	return IRQ_NONE;	
+}
+
+static int __init myirqtest_init(void)
+{
+	if(request_irq(irq,&amp;myinterrupt,IRQF_SHARED,interface,&amp;irq)) {
+		printk(KERN_ERR"myirqtest: cannot register IRQ %d \n",irq);
+	
+	return -EIO;
+	}
+
+	printk("%s Request on IRQ %d succeeded \n",interface,irq);
+
+	return 0;
+
+}
+
+
+static void __exit myirqtest_exit(void)
+{
+	printk("Unloading my module.\n");
+	free_irq(irq,&amp;irq);
+	printk("Freeing IRQ %d\n",irq);
+
+	return ;
+}
+
+module_init(myirqtest_init);
+module_exit(myirqtest_exit);
+MODULE_LICENSE("GPL");</code></pre>
+<blockquote>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>$ sudo insmod interrupt.ko irq=2 interface=myirq
+$ dmesg</code></pre>
+<blockquote>
+<p><img src="http://uliweb.clkg.org/uploads/tutorials/11/33eaa358eb9911e1926af23c91df0780.png"&gt;</p>
+<p>可能出现的问题：</p>
+<p>如果在dmesg后，打印信息中没有interrupt! 信息，可能为当前没有进行网络活动，请打开一个网址试试</p>
+<p>共享中断的编程模板：</p>
+</blockquote>
+<pre class="prettyprint linenums pre-scrollable"><code>//中断处理顶半部
+
+irqreturn_t xxx_interrupt(int irq, void * dev_id, struct pt_regs * regs)
+
+{
+
+      ………………
+
+      int status = read_int_status();//获知中断源
+
+      if(!(is_myint(dev_id, status))//判断时候是本设备中断
+
+      {
+
+            return IRQ_NONE;
+
+       }
+
+      ………….
+
+      return IRQ_HANDLED;
+
+}
+
+ 
+
+//设备驱动模块加载函数
+
+int xxx_init(void)
+
+{
+
+     ……………
+
+      //申请共享中断
+
+       result = request_irq( sh_irq, xxx_interrupt, SA_SHIRQ, “xxx”, xxx_dev);
+
+      ………………
+
+}
+
+ 
+
+//卸载函数
+
+void xxx_exit(void)
+
+{
+
+       ………………
+
+       free_irq(xxx_irq, xxx_interrupt);
+
+       ……………
+
+}</code></pre>
+<blockquote>
+<p>参考网址：</p>
+<p><a href="http://www.kerneltravel.net/?p=133">http://www.kerneltravel.net/?p=133</a></p>
+</blockquote>
+
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/82?para=0" class="para-comments-count active right animated">0</a>
+                            <span class="gray">valley 于 2012-09-19 02:59:10+00:00 更新</span>
+                        </p>
+                    </div>
+                    
+                    <!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1342595503212835&type=left&amp;btn=l1.gif" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<script src="http://mediaplayer.yahoo.com/js"></script>
+
+                
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
+                    </div>
+                
+                    <div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/80.html"><i class="icon-arrow-left"></i> 2.6 内核模块之内核线程</a>
+                    </div>
+                    <div class="chapter-next chapter-down animated">
+                        <a next-chapter href="/tutorial/view_chapter/109.html">2.8 下半部的机制 <i class="icon-arrow-right"></i></a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        <div class="span3" id="right-side">
+            
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<style>
+#toc {top:140px;}
+</style>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    /*(function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    */
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        //$('body').scrollspy({target:'#titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/82',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/82?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                        //处理toTop
+                        reset_totop();
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                        //处理toTop
+                        reset_totop();
+                    }
+                });
+                
+            }
+        });
+        /*
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        */
+        
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
+        //増加限制目录区高度的处理
+        //$('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        //$('#titles a').anchorScroll({offset:50});
+        
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
+        });
+        
+        
+        //増加代码提示
+        $('pre, .inline-tag').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
+        
+    });
+</script>
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+Uliweb
+</p>
+
+  </footer>
+</div>
+      
+
+
+<!-- bottomlinks -->
+<script>$.ajaxSetup({cache:false, traditional:true});</script>
+<script type="text/javascript" src="/static/pageslide/jquery.pageslide.js?ver=2"></script>
+<script type="text/javascript" src="/static/toc/toc.js?ver=2"></script>
+
+
+  </body>
+</html>
