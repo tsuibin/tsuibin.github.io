@@ -5,6 +5,7 @@ categorie: 至·绘
 ---
 
 h1. {{ page.title }}
+
 p(meta). 18 Oct 2008 - Wu Han
 
 <img class="" src="/images/zhihui/zhihui.gif">
@@ -103,7 +104,7 @@ p(meta). 18 Oct 2008 - Wu Han
 
 美编：欣凌罗 绘画：@思你妹儿
 <img class="" src="/images/endline.gif" >
-<img class="" src="/images/zhuanfa.gif" >
+<img class="" src="/images/zhuanfa.jpg" >
 <img class="" src="/images/gongzhonghao.jpeg" >
 
 
