@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 用含有杀菌剂的肥皂安全吗？
-categorie: 至·绘
+category: 至·绘
 ---
 
 h1. {{ page.title }}
