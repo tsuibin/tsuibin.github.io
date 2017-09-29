@@ -7,12 +7,12 @@ categorie: 至·绘
 h1. {{ page.title }}
 p(meta). 18 Oct 2008 - Wu Han
 
-<img class="" src="/images/zhihui/beepress-image-schedule-2-3-0-27496-1506616804.gif">
+<img class="" src="/images/zhihui/zhihui.gif">
 <img class="" src="/images/biaoyu.png">
 
 <img class="" src="/images/dian.gif" >
 用含有杀菌剂的肥皂安全吗？
-<img class="" src="/images/zhihui/1.jpeg" >
+<img class="" src="/images/zhihui/0.jpeg" >
 
 广泛存在于肥皂等个人用品里的杀菌剂三氯生，
 研究发现其可以影响鱼类和大鼠的肠道菌群，
@@ -20,7 +20,7 @@ p(meta). 18 Oct 2008 - Wu Han
 如果会，对健康又会有什么影响呢？
 
 
-<img class="" src="/images/zhihui/2.jpeg" >
+<img class="" src="/images/zhihui/1.jpeg" >
 
 说到肥皂……咳咳……重来，
 这是一篇严肃的文……
@@ -30,7 +30,7 @@ p(meta). 18 Oct 2008 - Wu Han
 到现在，杀菌剂已经广泛应用于
 肥皂、洗手液、湿巾、洗涤剂、牙膏、化妆品，
 甚至玩具和塑料制品等。
-<img class="" src="/images/zhihui/3.jpeg" >
+<img class="" src="/images/zhihui/2.jpeg" >
 
 超过75%的抗菌香皂里都含有一种常见杀菌剂
 —— 三氯生（Triclosan，简称TCS）
@@ -43,7 +43,7 @@ p(meta). 18 Oct 2008 - Wu Han
 消毒香皂、漱口水、牙膏、厨房洗涤剂、
 洗发剂、沐浴露和除臭剂等个人护理品，
 其中三氯生在这些产品中的含量大概为0.1%-0.3%。
-<img class="" src="/images/zhihui/4.jpeg" >
+<img class="" src="/images/zhihui/3.jpeg" >
 
 
 由于三氯生的广泛使用，
@@ -60,7 +60,7 @@ p(meta). 18 Oct 2008 - Wu Han
 
 目前看来，两种观点都还没有足够的论据来支撑。
 
-<img class="" src="/images/zhihui/5.jpeg" >
+<img class="" src="/images/zhihui/4.jpeg" >
 另一方面，
 接触抗菌剂会影响人体正常的微生物菌群，
 菌群的扰动与一系列疾病和代谢问题相关，
@@ -69,13 +69,13 @@ p(meta). 18 Oct 2008 - Wu Han
 会影响人体健康的程度，
 目前也还不清楚……
 
-<img class="" src="/images/zhihui/6.jpeg" >
+<img class="" src="/images/zhihui/5.jpeg" >
 
 还有一个引起担忧的问题是，
 产前、围产期、产后接触三氯生
 可能比成年后接触更加不利。
 
-<img class="" src="/images/zhihui/7.jpeg" >
+<img class="" src="/images/zhihui/6.jpeg" >
 
 实验：有研究发现幼年大鼠的微生物菌群系统
 比成年大鼠更容易受到化学物质的干扰。
@@ -83,7 +83,7 @@ p(meta). 18 Oct 2008 - Wu Han
 水平一致的口服剂量时，
 幼年大鼠的实验组与对照组微生物菌群有明显变化，而成年大鼠的结果则没有这么明显。
 
-<img class="" src="/images/zhihui/8.jpeg" >
+<img class="" src="/images/zhihui/7.jpeg" >
 
 我们知道三氯生和含有其他抗菌剂的消毒剂
 在医院使用剂量更高也更频繁，
@@ -92,7 +92,7 @@ p(meta). 18 Oct 2008 - Wu Han
 是最脆弱容易受到破坏的，
 因此有必要研究三氯生是否会影响
 婴幼儿微生物菌群组成和演替。
-<img class="" src="/images/zhihui/9.jpeg" >
+<img class="" src="/images/zhihui/8.jpeg" >
 综上所述，
 三氯生对人体微生物的影响还没有定论，
 目前还没有任何靠谱的研究证明三氯生致癌。
