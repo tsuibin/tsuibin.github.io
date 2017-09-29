@@ -2,6 +2,7 @@
 layout: post
 title: Optimize for Happiness
 categories: [test, sample]
+tags: [optimize, happiness]
 ---
 
 {{ page.title }}
