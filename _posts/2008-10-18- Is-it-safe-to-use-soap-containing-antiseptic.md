@@ -7,7 +7,7 @@ categorie: 至·绘
 h1. {{ page.title }}
 p(meta). 18 Oct 2008 - Wu Han
 
-<img class="" src="/images/zhihui/beepress-image-schedule-2-3-0-27496-1506616804.gif">
+<img class="" src="/images/zhihui/zhihui.gif">
 <img class="" src="/images/biaoyu.png">
 
 <img class="" src="/images/dian.gif" >
