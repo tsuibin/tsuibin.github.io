@@ -2,7 +2,6 @@
 layout: post
 title: Hello Test
 subtitle: 或许是最漂亮的Jekyll主题
-date: {}
 categories: 技术
 author: Jekyll
 cover: 'http://on2171g4d.bkt.clouddn.com/jekyll-banner.png'
