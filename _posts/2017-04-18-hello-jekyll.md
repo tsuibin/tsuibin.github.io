@@ -25,3 +25,5 @@ Throughout this guide there are a number of small-but-handy pieces of informatio
 ### Video Test
 
 <iframe type="text/html" width="100%" height="385" src="http://v.youku.com/v_show/id_XMjcyNzg0MDQwMA==.html" frameborder="0"></iframe>
+
+<iframe frameborder="0" width="640" height="498" src="https://v.qq.com/iframe/player.html?vid=l05402oxh6j&tiny=0&auto=0" allowfullscreen></iframe>
