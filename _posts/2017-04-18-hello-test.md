@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Hello Test
-subtitle: '或许是最漂亮的Jekyll主题'
-date: 2017-04-18
+subtitle: 或许是最漂亮的Jekyll主题
+date: {}
 categories: 技术
 author: Jekyll
 cover: 'http://on2171g4d.bkt.clouddn.com/jekyll-banner.png'
@@ -28,4 +28,4 @@ Throughout this guide there are a number of small-but-handy pieces of informatio
 
 <iframe type="text/html" width="100%" height="385" src="http://v.youku.com/v_show/id_XMjcyNzg0MDQwMA==.html" frameborder="0"></iframe>
 
-<iframe frameborder="0" width="640" height="498" src="https://v.qq.com/iframe/player.html?vid=l05402oxh6j&tiny=0&auto=0" allowfullscreen></iframe>
+<iframe frameborder="0" width="100%" height="385" src="https://v.qq.com/iframe/player.html?vid=l05402oxh6j&tiny=0&auto=0" allowfullscreen></iframe>
